@@ -1,7 +1,7 @@
 local char = 'leadmultispace:' .. (vim.g.indentLine_char or '┊')
 
 local function lms(rep)
-  return char .. string.rep(' ', rep > 0 and rep - 1 or 0)
+  return char .. string.rep(' ', rep > 0 and rep - 1 or 0)
 end
 
 local function update(old, rep)
