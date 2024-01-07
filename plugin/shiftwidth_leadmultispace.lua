@@ -35,16 +35,42 @@ vim.api.nvim_create_autocmd('BufWinEnter', {
 })
 
 -- Toggle with 'diff', as combined highligting doesn't look good.
+local function diff_reversed()
+  for _, e in ipairs({
+    'DiffAdd',
+    'DiffChange',
+    'DiffDelete',
+    'DiffText',
+  }) do
+    if vim.api.nvim_get_hl(0, { name = e }).reverse then return true end
+  end
+end
+
+local function diff_toggle()
+  if
+    diff_reversed()
+    and vim.wo.diff
+    and vim.wo.listchars:match('leadmultispace')
+  then
+    vim.w.__lms = true
+    vim.opt_local.listchars:remove('leadmultispace')
+  elseif vim.w.__lms and not (diff_reversed() and vim.wo.diff) then
+    vim.opt_local.listchars:append(lms(vim.bo.shiftwidth))
+    vim.w.__lms = nil
+  end
+end
+
 vim.api.nvim_create_autocmd('OptionSet', {
   pattern = 'diff',
   group = group,
+  callback = diff_toggle,
+})
+
+vim.api.nvim_create_autocmd('ColorScheme', {
+  group = group,
   callback = function()
-    if vim.v.option_new == '1' and vim.wo.listchars:match('leadmultispace') then
-      vim.w.__lms = true
-      vim.opt_local.listchars:remove('leadmultispace')
-    elseif vim.v.option_new == '0' and vim.w.__lms then
-      vim.opt_local.listchars:append(lms(vim.bo.shiftwidth))
-      vim.w.__lms = nil
+    for _, win in ipairs(vim.api.nvim_list_wins()) do
+      if vim.wo[win].diff then vim.api.nvim_win_call(win, diff_toggle) end
     end
   end,
 })
@@ -59,4 +85,6 @@ vim.api.nvim_create_user_command('IndentGuidesToggle', function()
 end, {})
 
 -- Set global default (unless `nvim -d foo bar`).
-if not vim.o.diff then vim.opt.listchars:append(lms(vim.o.shiftwidth)) end
+if not (diff_reversed() and vim.o.diff) then
+  vim.opt.listchars:append(lms(vim.o.shiftwidth))
+end
