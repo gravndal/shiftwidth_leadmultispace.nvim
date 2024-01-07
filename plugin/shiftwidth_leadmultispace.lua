@@ -39,10 +39,10 @@ vim.api.nvim_create_autocmd('OptionSet', {
   pattern = 'diff',
   group = group,
   callback = function()
-    if vim.v.option_new == '1' and vim.wo.listchars:match('leadmultispace') then
+    if vim.v.option_new and vim.wo.listchars:match('leadmultispace') then
       vim.w.__lms = true
       vim.opt_local.listchars:remove('leadmultispace')
-    elseif vim.v.option_new == '0' and vim.w.__lms then
+    elseif not vim.v.option_new and vim.w.__lms then
       vim.opt_local.listchars:append(lms(vim.bo.shiftwidth))
       vim.w.__lms = nil
     end
