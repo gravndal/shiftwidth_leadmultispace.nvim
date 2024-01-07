@@ -34,21 +34,6 @@ vim.api.nvim_create_autocmd('BufWinEnter', {
   end,
 })
 
--- Toggle with 'diff', as combined highligting doesn't look good.
-vim.api.nvim_create_autocmd('OptionSet', {
-  pattern = 'diff',
-  group = group,
-  callback = function()
-    if vim.v.option_new == '1' and vim.wo.listchars:match('leadmultispace') then
-      vim.w.__lms = true
-      vim.opt_local.listchars:remove('leadmultispace')
-    elseif vim.v.option_new == '0' and vim.w.__lms then
-      vim.opt_local.listchars:append(lms(vim.bo.shiftwidth))
-      vim.w.__lms = nil
-    end
-  end,
-})
-
 -- Define toggle :command.
 vim.api.nvim_create_user_command('IndentGuidesToggle', function()
   if vim.wo.listchars:match('leadmultispace') then
@@ -58,5 +43,5 @@ vim.api.nvim_create_user_command('IndentGuidesToggle', function()
   end
 end, {})
 
--- Set global default (unless `nvim -d foo bar`).
-if not vim.o.diff then vim.opt.listchars:append(lms(vim.o.shiftwidth)) end
+-- Set global default.
+vim.opt.listchars:append(lms(vim.o.shiftwidth))
