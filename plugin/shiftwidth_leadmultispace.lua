@@ -8,6 +8,14 @@ local function update(old, rep)
   return old:gsub('leadmultispace:[^,]*', lms(rep))
 end
 
+local function update_curbuf()
+  for _, w in ipairs(vim.api.nvim_list_wins()) do
+    if vim.api.nvim_win_get_buf(w) == vim.api.nvim_get_current_buf() then
+      vim.wo[w].listchars = update(vim.wo[w].listchars, vim.bo.shiftwidth)
+    end
+  end
+end
+
 local group = vim.api.nvim_create_augroup('ShiftwidthLeadmultispace', {})
 
 -- Sync with 'shiftwidth'.
@@ -16,11 +24,7 @@ vim.api.nvim_create_autocmd('OptionSet', {
   group = group,
   callback = function()
     if vim.v.option_type == 'local' then
-      for _, w in ipairs(vim.api.nvim_list_wins()) do
-        if vim.api.nvim_win_get_buf(w) == vim.api.nvim_get_current_buf() then
-          vim.wo[w].listchars = update(vim.wo[w].listchars, vim.bo.shiftwidth)
-        end
-      end
+      update_curbuf()
     else
       vim.go.listchars = update(vim.go.listchars, vim.go.shiftwidth)
     end
@@ -32,6 +36,14 @@ vim.api.nvim_create_autocmd('BufWinEnter', {
   group = group,
   callback = function()
     vim.wo.listchars = update(vim.wo.listchars, vim.bo.shiftwidth)
+  end,
+})
+
+-- Handle cases where 'filetype' is set after BufWinEnter.
+vim.api.nvim_create_autocmd('FileType', {
+  group = group,
+  callback = function()
+    update_curbuf()
   end,
 })
 
