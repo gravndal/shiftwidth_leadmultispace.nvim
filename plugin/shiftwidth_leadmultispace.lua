@@ -27,10 +27,7 @@ vim.api.nvim_create_autocmd('OptionSet', {
   end,
 })
 
--- OptionSet isn't triggered on startup, nor when switching to an already
--- visible buffer with :b. A side effect of this autocmd is that we will
--- sometimes update the window local 'listchars' twice on :edit, I can't be
--- bothered to optimise this as it doesn't really matter.
+-- Update 'listchars' when displaying buffer in a window.
 vim.api.nvim_create_autocmd('BufWinEnter', {
   group = group,
   callback = function()
