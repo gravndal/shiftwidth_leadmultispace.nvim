@@ -16,7 +16,11 @@ vim.api.nvim_create_autocmd('OptionSet', {
   group = group,
   callback = function()
     if vim.v.option_type == 'local' then
-      vim.wo.listchars = update(vim.wo.listchars, vim.bo.shiftwidth)
+      for _, w in ipairs(vim.api.nvim_list_wins()) do
+        if vim.api.nvim_win_get_buf(w) == vim.api.nvim_get_current_buf() then
+          vim.wo[w].listchars = update(vim.wo[w].listchars, vim.bo.shiftwidth)
+        end
+      end
     else
       vim.go.listchars = update(vim.go.listchars, vim.go.shiftwidth)
     end
