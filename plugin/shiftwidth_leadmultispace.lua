@@ -18,7 +18,7 @@ vim.api.nvim_create_autocmd('OptionSet', {
     if vim.v.option_type == 'local' then
       vim.wo.listchars = update(vim.wo.listchars, vim.bo.shiftwidth)
     else
-      vim.o.listchars = update(vim.o.listchars, vim.o.shiftwidth)
+      vim.go.listchars = update(vim.go.listchars, vim.go.shiftwidth)
     end
   end,
 })
@@ -44,4 +44,4 @@ vim.api.nvim_create_user_command('IndentGuidesToggle', function()
 end, {})
 
 -- Set global default.
-vim.opt.listchars:append(lms(vim.o.shiftwidth))
+vim.opt_global.listchars:append(lms(vim.go.shiftwidth))
