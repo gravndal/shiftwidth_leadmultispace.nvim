@@ -23,11 +23,10 @@ vim.api.nvim_create_autocmd('OptionSet', {
   pattern = 'shiftwidth',
   group = group,
   callback = function()
-    if vim.v.option_type == 'local' then
-      update_curbuf()
-    else
+    if vim.v.option_type ~= 'local' then
       vim.go.listchars = update(vim.go.listchars, vim.go.shiftwidth)
     end
+    update_curbuf()
   end,
 })
 
