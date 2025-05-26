@@ -1,3 +1,12 @@
+local api = vim.api
+
+local bo, go, wo = vim.bo, vim.go, vim.wo
+local v = vim.v
+
+local nvim_get_current_buf = api.nvim_get_current_buf
+local nvim_list_wins = api.nvim_list_wins
+local nvim_win_get_buf = api.nvim_win_get_buf
+
 local char = 'leadmultispace:' .. (vim.g.indentLine_char or '┊')
 
 local function lms(rep)
@@ -9,37 +18,38 @@ local function update(old, rep)
 end
 
 local function update_curbuf()
-  for _, w in ipairs(vim.api.nvim_list_wins()) do
-    if vim.api.nvim_win_get_buf(w) == vim.api.nvim_get_current_buf() then
-      vim.wo[w].listchars = update(vim.wo[w].listchars, vim.bo.shiftwidth)
+  local curbuf = nvim_get_current_buf()
+  for _, w in ipairs(nvim_list_wins()) do
+    if nvim_win_get_buf(w) == curbuf then
+      wo[w].listchars = update(wo[w].listchars, bo.shiftwidth)
     end
   end
 end
 
-local group = vim.api.nvim_create_augroup('ShiftwidthLeadmultispace', {})
+local group = api.nvim_create_augroup('ShiftwidthLeadmultispace', {})
 
 -- Sync with 'shiftwidth'.
-vim.api.nvim_create_autocmd('OptionSet', {
+api.nvim_create_autocmd('OptionSet', {
   pattern = 'shiftwidth',
   group = group,
   callback = function()
-    if vim.v.option_type ~= 'local' then
-      vim.go.listchars = update(vim.go.listchars, vim.go.shiftwidth)
+    if v.option_type ~= 'local' then
+      go.listchars = update(go.listchars, go.shiftwidth)
     end
     update_curbuf()
   end,
 })
 
 -- Update 'listchars' when displaying buffer in a window.
-vim.api.nvim_create_autocmd('BufWinEnter', {
+api.nvim_create_autocmd('BufWinEnter', {
   group = group,
   callback = function()
-    vim.wo.listchars = update(vim.wo.listchars, vim.bo.shiftwidth)
+    wo.listchars = update(wo.listchars, bo.shiftwidth)
   end,
 })
 
 -- Handle cases where 'filetype' is set after BufWinEnter.
-vim.api.nvim_create_autocmd('FileType', {
+api.nvim_create_autocmd('FileType', {
   group = group,
   callback = function()
     update_curbuf()
@@ -47,13 +57,13 @@ vim.api.nvim_create_autocmd('FileType', {
 })
 
 -- Define toggle :command.
-vim.api.nvim_create_user_command('IndentGuidesToggle', function()
-  if vim.wo.listchars:match('leadmultispace') then
+api.nvim_create_user_command('IndentGuidesToggle', function()
+  if wo.listchars:match('leadmultispace') then
     vim.opt_local.listchars:remove('leadmultispace')
   else
-    vim.opt_local.listchars:append(lms(vim.bo.shiftwidth))
+    vim.opt_local.listchars:append(lms(bo.shiftwidth))
   end
 end, {})
 
 -- Set global default.
-vim.opt_global.listchars:append(lms(vim.go.shiftwidth))
+vim.opt_global.listchars:append(lms(go.shiftwidth))
