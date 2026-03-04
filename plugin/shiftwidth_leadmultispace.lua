@@ -7,10 +7,14 @@ local nvim_get_current_buf = api.nvim_get_current_buf
 local nvim_list_wins = api.nvim_list_wins
 local nvim_win_get_buf = api.nvim_win_get_buf
 
-local char = 'leadmultispace:' .. (vim.g.indentLine_char or '┊')
+local char = vim.g.indentLine_char or '┊'
 
 local function lms(rep)
-  return char .. string.rep(' ', rep > 0 and rep - 1 or 0)
+  return string.format(
+    'leadmultispace:%s%s',
+    char,
+    string.rep(' ', rep > 0 and rep - 1 or 0)
+  )
 end
 
 local function update(old, rep)
@@ -65,5 +69,6 @@ api.nvim_create_user_command('IndentGuidesToggle', function()
   end
 end, {})
 
--- Set global default.
+-- Set global defaults.
 vim.opt_global.listchars:append(lms(go.shiftwidth))
+vim.opt_global.listchars:append(string.format('leadtab:%s ', char))
