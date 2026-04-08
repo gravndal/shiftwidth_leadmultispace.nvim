@@ -64,8 +64,10 @@ api.nvim_create_autocmd('FileType', {
 api.nvim_create_user_command('IndentGuidesToggle', function()
   if wo.listchars:match('leadmultispace') then
     vim.opt_local.listchars:remove('leadmultispace')
+    vim.opt_local.listchars:remove('leadtab')
   else
     vim.opt_local.listchars:append(lms(bo.shiftwidth))
+    vim.opt_local.listchars:append(string.format('leadtab:%s ', char))
   end
 end, {})
 
