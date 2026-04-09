@@ -1,3 +1,6 @@
+-- SPDX-FileCopyrightText: © 2022-2026 Gaute T. Ravndal
+-- SPDX-License-Identifier: Apache-2.0
+
 local api = vim.api
 
 local bo, go, wo = vim.bo, vim.go, vim.wo
